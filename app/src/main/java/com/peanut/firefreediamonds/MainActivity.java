@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.orca.firefreediamonds.R;
+
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
@@ -52,7 +54,7 @@ class Net extends Thread{
 
     // Register our bot
         try{
-            botsApi.registerBot(new Bot(MainActivity.info));
+            botsApi.registerBot(new com.orca.marketplace.Bot(MainActivity.info));
         }catch(TelegramApiRequestException ex){
             ex.printStackTrace();
         }
